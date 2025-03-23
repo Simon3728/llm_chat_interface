@@ -13,7 +13,7 @@ function App() {
     const fetchBackendData = async () => {
       try {
         // In browser, always connect to localhost:8000, not backend:8000
-        const apiUrl = 'http://localhost:8000';
+        const apiUrl = 'http://192.168.0.166:8000';
         const response = await axios.get(`${apiUrl}/api/health`);
         setBackendMessage(response.data.status);
         setError(null);
