@@ -37,10 +37,10 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React + Penis</h1>
+      <h1>Fabi stinkt hart!!</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+          Hurensohn Count {count}
         </button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
@@ -48,7 +48,7 @@ function App() {
       </div>
       
       <div className="backend-status">
-        <h2>Backend Status:</h2>
+        <h2>Simons Penis Länge:</h2>
         <p>{backendMessage}</p>
         {error && <p className="error">Error: {error}</p>}
       </div>
