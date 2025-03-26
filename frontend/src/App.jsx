@@ -12,7 +12,8 @@ function App() {
   useEffect(() => {
     const fetchBackendData = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const 
+        const apiUrl = import.meta.env.VITE_API_URL;
         const response = await axios.get(`${apiUrl}/api/health`);
         setBackendMessage(response.data.status);
         setError(null);

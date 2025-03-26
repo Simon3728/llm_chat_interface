@@ -6,23 +6,37 @@ services:
       context: ./frontend
     container_name: llm_chat_interface_frontend
     ports:
-      - "3000:80"
+      - "3000:80"  # HTTP
+      - "3443:443" # HTTPS
+    volumes:
+      - ./certs/${APP_ENV:-dev}:/etc/nginx/certs:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
     depends_on:
       - backend
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - DOCKER=true
 
   backend:
     build:
       context: ./backend
     container_name: llm_chat_interface_backend
     ports:
-      - "8000:8000"
+      - "8000:8000"  # HTTP
+      - "8443:8443"  # HTTPS
+    volumes:
+      - ./certs:/app/certs:ro
     restart: unless-stopped
     environment:
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://192.168.0.166:3000}
+      - APP_ENV=${APP_ENV:-production}
+      - DOCKER=${DOCKER:-true}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - SERVER_IP=${SERVER_IP:-192.168.0.166}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-dev_user}:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/${POSTGRES_DB:-app_db}
     depends_on:
       - postgres
+    command: ["python", "run.py"]
 
   postgres:
     image: postgres:15-alpine

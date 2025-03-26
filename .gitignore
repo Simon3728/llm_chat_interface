@@ -34,3 +34,6 @@ backend/.pytest_cache/
 .env
 .DS_Store
 *.log
+
+# Certificates (IMPORTANT: don't commit these to Git)
+certs/
