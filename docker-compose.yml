@@ -4,16 +4,20 @@ services:
   frontend:
     build:
       context: ./frontend
+    container_name: llm_chat_interface_frontend
     ports:
       - "3000:80"
+    restart: unless-stopped
     depends_on:
       - backend
 
   backend:
     build:
       context: ./backend
+    container_name: llm_chat_interface_backend
     ports:
       - "8000:8000"
+    restart: unless-stopped
     environment:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://192.168.0.166:3000}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-dev_user}:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/${POSTGRES_DB:-app_db}
@@ -22,6 +26,8 @@ services:
 
   postgres:
     image: postgres:15-alpine
+    container_name: llm_chat_interface_postgres
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
@@ -34,3 +40,4 @@ services:
 
 volumes:
   postgres_data:
+    name: llm_chat_interface_postgres_data

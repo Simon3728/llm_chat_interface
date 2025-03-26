@@ -1,6 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -9,6 +17,8 @@ cors_origins_env = os.getenv("CORS_ORIGINS", "")
 
 default_origins = ["http://localhost:5173", "http://localhost:3000", "http://frontend"]
 allowed_origins = cors_origins_env.split(",") if cors_origins_env else default_origins
+
+logger.info(f"Configuring CORS with origins: {allowed_origins}")
 
 # Add CORS middleware
 app.add_middleware(
@@ -25,4 +35,9 @@ async def root():
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "1 Fuß"}
+    try:
+        # Here you could add a DB connection check if needed
+        return {"status": "OK"}
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Server error")
