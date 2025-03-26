@@ -15,5 +15,22 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENVIRONMENT=production
-      - CORS_ORIGINS=http://192.168.0.166:3000
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://192.168.0.166:3000}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dev_user}:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/${POSTGRES_DB:-app_db}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-dev_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password}
+      - POSTGRES_DB=${POSTGRES_DB:-app_db}
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
