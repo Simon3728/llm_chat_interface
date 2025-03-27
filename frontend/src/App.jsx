@@ -8,12 +8,18 @@ function App() {
   const [count, setCount] = useState(0)
   const [backendMessage, setBackendMessage] = useState('Loading...')
   const [error, setError] = useState(null)
+  const [apiInfo, setApiInfo] = useState({})
 
   useEffect(() => {
+    // Get API URL from environment variables
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    // Log for debugging
+    console.log('Using API URL:', apiUrl);
+    setApiInfo({ url: apiUrl });
+
     const fetchBackendData = async () => {
       try {
-        const 
-        const apiUrl = import.meta.env.VITE_API_URL;
         const response = await axios.get(`${apiUrl}/api/health`);
         setBackendMessage(response.data.status);
         setError(null);
@@ -37,10 +43,10 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Fabi stinkt hart!!</h1>
+      <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
-          Hurensohn Count {count}
+          Count is Hurensohn {count}
         </button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
@@ -48,8 +54,9 @@ function App() {
       </div>
       
       <div className="backend-status">
-        <h2>Simons Penis Länge:</h2>
+        <h2>Backend Status:</h2>
         <p>{backendMessage}</p>
+        <p>API URL: {apiInfo.url}</p>
         {error && <p className="error">Error: {error}</p>}
       </div>
       

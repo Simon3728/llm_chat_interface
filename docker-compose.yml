@@ -1,4 +1,4 @@
-version: '3.8'
+# Remove the version line as it's obsolete
 
 services:
   frontend:
@@ -6,16 +6,17 @@ services:
       context: ./frontend
     container_name: llm_chat_interface_frontend
     ports:
-      - "3000:80"  # HTTP
-      - "3443:443" # HTTPS
+      - "3000:80"  # Use HTTP for local Docker
     volumes:
-      - ./certs/${APP_ENV:-dev}:/etc/nginx/certs:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     environment:
-      - APP_ENV=${APP_ENV:-production}
+      - APP_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - USE_HTTPS=false
       - DOCKER=true
 
   backend:
@@ -23,19 +24,17 @@ services:
       context: ./backend
     container_name: llm_chat_interface_backend
     ports:
-      - "8000:8000"  # HTTP
-      - "8443:8443"  # HTTPS
-    volumes:
-      - ./certs:/app/certs:ro
+      - "8000:8000"  # Use HTTP for local Docker
     restart: unless-stopped
     environment:
-      - APP_ENV=${APP_ENV:-production}
-      - DOCKER=${DOCKER:-true}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      - SERVER_IP=${SERVER_IP:-192.168.0.166}
+      - APP_ENV=development
+      - DOCKER=true
+      - USE_HTTPS=false
+      - CORS_ORIGINS=http://localhost:3000
       - DATABASE_URL=postgresql://${POSTGRES_USER:-dev_user}:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/${POSTGRES_DB:-app_db}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
     command: ["python", "run.py"]
 
   postgres:

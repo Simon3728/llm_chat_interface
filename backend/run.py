@@ -11,23 +11,27 @@ logger = logging.getLogger(__name__)
 
 # Determine environment and HTTPS settings
 app_env = os.getenv("APP_ENV", "development")
-use_https = os.getenv("USE_HTTPS", "true").lower() == "true"
 is_dev = app_env == "development"
+is_docker = os.getenv("DOCKER", "false").lower() == "true"
+is_server = not is_dev  # If not dev, assume server/production
+
+# Only use HTTPS on server, not for any local development
+use_https = is_server and os.getenv("USE_HTTPS", "true").lower() == "true"
+
+logger.info(f"Starting with APP_ENV={app_env}, USE_HTTPS={use_https}, DOCKER={is_docker}")
 
 if __name__ == "__main__":
-    # Default configuration
+    # Default configuration - use HTTP for all local development
     config = {
         "app": "app.main:app",
         "host": "0.0.0.0",
         "port": 8000,
-        "reload": is_dev,  # Only use reload in development
+        "reload": is_dev and not is_docker,  # Only use reload in development and not in Docker
     }
     
-    # Set up HTTPS if enabled
-    if use_https:
-        # Path to certificates depends on environment
-        cert_dir = "../certs/dev" if is_dev else "../certs/prod"
-        cert_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), cert_dir)
+    # Only use HTTPS in server environment
+    if use_https and is_server:
+        cert_path = "/app/certs/prod"
         
         ssl_keyfile = os.path.join(cert_path, "key.pem")
         ssl_certfile = os.path.join(cert_path, "cert.pem")

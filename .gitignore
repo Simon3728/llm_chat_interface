@@ -31,7 +31,7 @@ backend/*.pyd
 backend/.pytest_cache/
 
 # General
-.env
+#.env
 .DS_Store
 *.log
 
