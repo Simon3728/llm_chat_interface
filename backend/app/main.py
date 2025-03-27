@@ -16,31 +16,30 @@ app = FastAPI()
 ENV = os.getenv("APP_ENV", "development")
 IS_DEV = ENV == "development"
 IS_DOCKER = os.getenv("DOCKER", "false").lower() == "true"
-USE_HTTPS = os.getenv("USE_HTTPS", "false").lower() == "true" or IS_DOCKER
 
 # Get CORS origins from environment or use defaults
 cors_origins_env = os.getenv("CORS_ORIGINS", "")
 
 # Default origins set based on environment
 if IS_DEV and not IS_DOCKER:
-    # Local development without Docker - HTTPs
+    # Local development without Docker
     default_origins = ["http://localhost:5173"]
 elif IS_DOCKER:
-    # Docker environment - HTTPS by default
+    # Docker environment
     default_origins = ["http://localhost:3000"]
 else:
-    # Production (server) - will be determined later
+    # Production (server)
     default_origins = []
     server_ip = os.getenv("SERVER_IP", "192.168.0.166")
     default_origins.extend([
-        f"https://{server_ip}:3443",
-        "https://yourdomain.com"  # Replace with your actual domain
+        f"http://{server_ip}:3000",
+        "http://yourdomain.com"  # Replace with your actual domain
     ])
 
 # If explicit CORS settings provided, use those
 allowed_origins = cors_origins_env.split(",") if cors_origins_env else default_origins
 
-logger.info(f"Running in {ENV} environment with Docker={IS_DOCKER}, HTTPS={USE_HTTPS}")
+logger.info(f"Running in {ENV} environment with Docker={IS_DOCKER}")
 logger.info(f"Configuring CORS with origins: {allowed_origins}")
 
 # Add CORS middleware
@@ -58,7 +57,6 @@ async def root():
         "message": "Hello World", 
         "environment": ENV,
         "docker": IS_DOCKER,
-        "https": USE_HTTPS,
         "cors_origins": allowed_origins
     }
 
